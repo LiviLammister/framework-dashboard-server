@@ -12,7 +12,7 @@ if (process.env.DATABASE_URL) {
     })
 } else {
     db = new Sequelize(
-        process.env.DATABASE_URL,
+        'postgres://localhost:5432/framework-dashboard',
         { logging: false }
     );
 }
