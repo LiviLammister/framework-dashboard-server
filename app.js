@@ -23,7 +23,7 @@ app.use(bodyParser.json())
 
 // Allows front end to access the API
 app.use(cors({
-    origin: 'http://localhost:4200',
+    origin: 'https://framework-dashboard-89a5d.firebaseapp.com/',
     optionsSuccessStatus: 200
 }))
 
