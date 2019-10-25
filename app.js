@@ -32,6 +32,8 @@ const EMBER = 'ember';
 const REACT = 'react';
 const VUE = 'vue';
 
+app.options('*', cors())
+
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
