@@ -1,12 +1,31 @@
 'use strict';
 
 const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const session = require('express-session');
 
 const db = require('./db/db');
 const { User } = require('./db/models');
 
 const app = express();
-app.use(express.json());
+
+// Creates sessionID
+app.use(session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: false
+}));
+
+// Allows me to read JSONs in request body
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+
+// Allows front end to access the API
+app.use(cors({
+    origin: 'http://localhost:4200',
+    optionsSuccessStatus: 200
+}))
 
 const ANGULAR = 'angular';
 const EMBER = 'ember';
@@ -36,13 +55,23 @@ app.get('/api/frameworks', async (req, res, next) => {
 app.get('/api/frameworks/:framework', async (req, res, next) => {
     const vote = req.params.framework;
     const usersThatVotedForThisFramework = await User.findAll({ where: { vote } })
-    res.send({count: usersThatVotedForThisFramework.length})
+    res.send({ count: usersThatVotedForThisFramework.length })
     next();
 });
 
 // Creates a new user
-app.post('/api/user', (req, res, next) => {
-    User.create(req.body);
+app.put('/api/user', async (req, res, next) => {
+    const { body, sessionID } = req;
+    const { email, vote } = body;
+    User.findOne({ where: { email } }).then(user => {
+        if (user) {
+            if (user.sessionID !== sessionID) {
+                User.update({ vote }, { where: { email } });
+            }
+        } else {
+            User.create({ email, vote, sessionID });
+        }
+    })
     next();
 });
 
