@@ -21,11 +21,11 @@ app.use(session({
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
-// Allows front end to access the API
-app.use(cors({
-    origin: 'https://framework-dashboard-89a5d.firebaseapp.com/',
-    optionsSuccessStatus: 200
-}))
+// // Allows front end to access the API
+// app.use(cors({
+//     origin: 'https://framework-dashboard-89a5d.firebaseapp.com/',
+//     optionsSuccessStatus: 200
+// }))
 
 const ANGULAR = 'angular';
 const EMBER = 'ember';
@@ -37,7 +37,7 @@ app.get('/', (req, res) => {
 });
 
 // Get number of votes for all frameworks
-app.get('/api/frameworks', async (req, res, next) => {
+app.get('/api/frameworks', cors(), async (req, res, next) => {
     const angular = await User.findAll({ where: { vote: ANGULAR } });
     const ember = await User.findAll({ where: { vote: EMBER } });
     const react = await User.findAll({ where: { vote: REACT } });
@@ -52,7 +52,7 @@ app.get('/api/frameworks', async (req, res, next) => {
 })
 
 // Get number of votes for a given framework
-app.get('/api/frameworks/:framework', async (req, res, next) => {
+app.get('/api/frameworks/:framework', cors(), async (req, res, next) => {
     const vote = req.params.framework;
     const usersThatVotedForThisFramework = await User.findAll({ where: { vote } })
     res.send({ count: usersThatVotedForThisFramework.length })
@@ -60,7 +60,7 @@ app.get('/api/frameworks/:framework', async (req, res, next) => {
 });
 
 // Creates a new user
-app.put('/api/user', async (req, res, next) => {
+app.put('/api/user', cors(), async (req, res, next) => {
     const { body, sessionID } = req;
     const { email, vote } = body;
     User.findOne({ where: { email } }).then(user => {
